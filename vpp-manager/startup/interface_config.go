@@ -30,7 +30,7 @@ import (
 )
 
 func getInterfaceConfig(params *config.VppManagerParams) (conf *config.InterfaceConfig, err error) {
-	conf, err = loadInterfaceConfigFromLinux(params)
+	conf, err = LoadInterfaceConfigFromLinux(params)
 	if err == nil {
 		err = saveConfig(params, conf)
 		if err != nil {
@@ -52,7 +52,7 @@ func getInterfaceConfig(params *config.VppManagerParams) (conf *config.Interface
 	return conf, nil
 }
 
-func loadInterfaceConfigFromLinux(params *config.VppManagerParams) (*config.InterfaceConfig, error) {
+func LoadInterfaceConfigFromLinux(params *config.VppManagerParams) (*config.InterfaceConfig, error) {
 	conf := config.InterfaceConfig{}
 	link, err := netlink.LinkByName(params.MainInterface)
 	if err != nil {
