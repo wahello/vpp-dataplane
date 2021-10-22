@@ -26,9 +26,11 @@ import (
 )
 
 const (
-	FeatureArcCnatInput  = "ip?-unicast cnat-input-ip?"
-	FeatureArcCnatOutput = "ip?-output cnat-output-ip?"
-	FeatureArcSnat       = "ip?-unicast cnat-snat-ip?"
+	FeatureArcCnatLookup    = "ip?-unicast cnat-lookup-ip?"
+	FeatureArcCnatInput     = "ip?-unicast cnat-input-ip?"
+	FeatureArcCnatOutput    = "ip?-output cnat-output-ip?"
+	FeatureArcCnatWriteBack = "ip?-output cnat-writeback-ip?"
+	FeatureArcSnat          = "ip?-unicast cnat-snat-ip?"
 )
 
 const InvalidID = ^uint32(0)
@@ -134,6 +136,14 @@ func (v *VppLink) CnatDelSnatPrefix(prefix *net.IPNet) error {
 }
 
 func (v *VppLink) CnatEnableFeatures(swIfIndex uint32) (err error) {
+	err = v.EnableFeatureArc46(swIfIndex, FeatureArcCnatLookup)
+	if err != nil {
+		return errors.Wrap(err, "Error enabling arc dnat in")
+	}
+	err = v.EnableFeatureArc46(swIfIndex, FeatureArcCnatWriteBack)
+	if err != nil {
+		return errors.Wrap(err, "Error enabling arc dnat out")
+	}
 	err = v.EnableFeatureArc46(swIfIndex, FeatureArcCnatInput)
 	if err != nil {
 		return errors.Wrap(err, "Error enabling arc dnat in")

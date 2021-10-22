@@ -84,7 +84,7 @@ function git_clone_cd_and_reset ()
 
 # --------------- Things to cherry pick ---------------
 
-git_clone_cd_and_reset "$1" 88019c40725704e6998625937c764d1d0c827975
+git_clone_cd_and_reset "$1" 5b9cb0d275959aeb7f4e9dfb7353b638ec9a2e5a
 
 git_cherry_pick refs/changes/12/33312/4 # 33312: sr: fix srv6 definition of behavior associated to a LocalSID | https://gerrit.fd.io/r/c/vpp/+/33312
 git_cherry_pick refs/changes/13/34713/3 # 34713: vppinfra: improve & test abstract socket | https://gerrit.fd.io/r/c/vpp/+/34713
@@ -92,11 +92,17 @@ git_cherry_pick refs/changes/71/32271/15 # 32271: memif: add support for ns abst
 git_cherry_pick refs/changes/34/34734/2 # 34734: memif: autogenerate socket_ids | https://gerrit.fd.io/r/c/vpp/+/34734
 git_cherry_pick refs/changes/26/34726/1 # 34726: interface: add buffer stats api | https://gerrit.fd.io/r/c/vpp/+/34726
 git_cherry_pick refs/changes/57/34757/1 # 34757: tap: add num_tx_queues API | https://gerrit.fd.io/r/c/vpp/+/34757
+git_cherry_pick refs/changes/74/34674/1 # 34674: vppinfra: add new bihash exports | https://gerrit.fd.io/r/c/vpp/+/34674
+
+git_cherry_pick refs/changes/49/31449/8 # 31449: cnat: dont compute offloaded cksums | https://gerrit.fd.io/r/c/vpp/+/31449
+git_cherry_pick refs/changes/08/34108/3 # 34108: cnat: flag to disable rsession | https://gerrit.fd.io/r/c/vpp/+/34108
+git_cherry_pick refs/changes/21/32821/4 # 32821: cnat: add ip/client bihash | https://gerrit.fd.io/r/c/vpp/+/32821
+git_cherry_pick refs/changes/48/29748/3 # 29748: cnat: remove rwlock on ts | https://gerrit.fd.io/r/c/vpp/+/29748
+git_cherry_pick refs/changes/52/34552/4 # 34552: cnat: add single lookup | https://gerrit.fd.io/r/c/vpp/+/34552
+git_cherry_pick refs/changes/88/31588/3 # 31588: cnat: [WIP] no k8s maglev from pods | https://gerrit.fd.io/r/c/vpp/+/31588
 
 # --------------- Dedicated plugins ---------------
 git_cherry_pick refs/changes/64/33264/7 # 33264: pbl: Port based balancer | https://gerrit.fd.io/r/c/vpp/+/33264
-git_cherry_pick refs/changes/88/31588/1 # 31588: cnat: [WIP] no k8s maglev from pods | https://gerrit.fd.io/r/c/vpp/+/31588
 git_cherry_pick refs/changes/83/28083/20 # 28083: acl: acl-plugin custom policies |  https://gerrit.fd.io/r/c/vpp/+/28083
 git_cherry_pick refs/changes/13/28513/24 # 25813: capo: Calico Policies plugin | https://gerrit.fd.io/r/c/vpp/+/28513
 # --------------- Dedicated plugins ---------------
-

@@ -1,11 +1,17 @@
-VPP Version                 : 22.02-rc0~408-g2c81b117d
+VPP Version                 : 22.02-rc0~462-g10486066f
 Binapi-generator version    : govpp v0.4.0-dev
-VPP Base commit             : 88019c407 vppinfra: toeplitz hash four in parallel
+VPP Base commit             : 5b9cb0d27 dpdk: remove unused flag
 ------------------ Cherry picked commits --------------------
 gerrit:28513/24 capo: Calico Policies plugin
 gerrit:28083/20 acl: acl-plugin custom policies
-gerrit:31588/1 cnat: [WIP] no k8s maglev from pods
 gerrit:33264/7 pbl: Port based balancer
+gerrit:31588/3 cnat: [WIP] no k8s maglev from pods
+gerrit:34552/4 cnat: add single lookup
+gerrit:29748/3 cnat: remove rwlock on ts
+gerrit:32821/4 cnat: add ip/client bihash
+gerrit:34108/3 cnat: flag to disable rsession
+gerrit:31449/8 cnat: dont compute offloaded cksums
+gerrit:34674/1 vppinfra: add new bihash exports
 gerrit:34757/1 tap: add num_tx_queues API
 gerrit:34726/1 interface: add buffer stats api
 gerrit:34734/2 memif: autogenerate socket_ids
