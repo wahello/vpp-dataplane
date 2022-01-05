@@ -171,6 +171,7 @@ func (s *Server) Add(ctx context.Context, request *pb.AddRequest) (*pb.AddReply,
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
+	s.log.Warnf("Got Add request for network: %s", request.DataplaneOptions["network_name"])
 	s.log.Infof("Adding Pod %s", podSpec.String())
 
 	existingSpec, ok := s.podInterfaceMap[podSpec.Key()]
@@ -308,7 +309,7 @@ func (s *Server) Del(ctx context.Context, request *pb.DelRequest) (*pb.DelReply,
 	}
 
 	delete(s.podInterfaceMap, initialSpec.Key())
-	err := storage.PersistCniServerState(s.podInterfaceMap, config.CniServerStateFile + fmt.Sprint(storage.CniServerStateFileVersion))
+	err := storage.PersistCniServerState(s.podInterfaceMap, config.CniServerStateFile+fmt.Sprint(storage.CniServerStateFileVersion))
 	if err != nil {
 		s.log.Errorf("CNI state persist errored %v", err)
 	}
