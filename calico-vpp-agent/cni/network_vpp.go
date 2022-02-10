@@ -17,6 +17,7 @@ package cni
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/containernetworking/plugins/pkg/ns"
 	"github.com/pkg/errors"
@@ -27,6 +28,11 @@ import (
 	"github.com/projectcalico/vpp-dataplane/vpplink"
 	"github.com/projectcalico/vpp-dataplane/vpplink/types"
 )
+
+type NetworkPod struct {
+	NetworkVni  uint32
+	ContainerIP *net.IPNet
+}
 
 func getInterfaceVrfName(podSpec *storage.LocalPodSpec, suffix string) string {
 	return fmt.Sprintf("pod-%s-table-%s", podSpec.Key(), suffix)
@@ -166,24 +172,34 @@ func (s *Server) AddVppInterface(podSpec *storage.LocalPodSpec, doHostSideConf b
 		}
 	}
 
-	s.log.Infof("Announcing Pod Addresses")
-	for _, containerIP := range podSpec.GetContainerIps() {
-		common.SendEvent(common.CalicoVppEvent{
-			Type: common.LocalPodAddressAdded,
-			New:  containerIP,
-		})
+	if podSpec.NetworkName == "" {
+		s.log.Infof("Announcing Pod Addresses")
+		for _, containerIP := range podSpec.GetContainerIps() {
+			common.SendEvent(common.CalicoVppEvent{
+				Type: common.LocalPodAddressAdded,
+				New:  containerIP,
+			})
+		}
+	} else {
+		s.log.Infof("Announcing Network Pod Addresses")
+		for _, containerIP := range podSpec.GetContainerIps() {
+			common.SendEvent(common.CalicoVppEvent{
+				Type: common.LocalNetworkPodAddressAdded,
+				New:  NetworkPod{ContainerIP: containerIP, NetworkVni: s.networkDefinitions[podSpec.NetworkName].Vni},
+			})
+		}
 	}
-
 	s.log.Infof("Adding HostPorts")
 	err = s.AddHostPort(podSpec, stack)
 	if err != nil {
 		goto err
 	}
-
-	common.SendEvent(common.CalicoVppEvent{
-		Type: common.PodAdded,
-		New:  podSpec,
-	})
+	if podSpec.NetworkName == "" {
+		common.SendEvent(common.CalicoVppEvent{
+			Type: common.PodAdded,
+			New:  podSpec,
+		})
+	}
 	s.availableBuffers -= buffersNeeded
 	return podSpec.TunTapSwIfIndex, err
 
@@ -198,11 +214,20 @@ err:
 func (s *Server) DelVppInterface(podSpec *storage.LocalPodSpec) {
 	s.DelHostPort(podSpec)
 
-	for _, containerIP := range podSpec.GetContainerIps() {
-		common.SendEvent(common.CalicoVppEvent{
-			Type: common.LocalPodAddressDeleted,
-			Old:  containerIP,
-		})
+	if podSpec.NetworkName == "" {
+		for _, containerIP := range podSpec.GetContainerIps() {
+			common.SendEvent(common.CalicoVppEvent{
+				Type: common.LocalPodAddressDeleted,
+				Old:  containerIP,
+			})
+		}
+	} else {
+		for _, containerIP := range podSpec.GetContainerIps() {
+			common.SendEvent(common.CalicoVppEvent{
+				Type: common.LocalNetworkPodAddressDeleted,
+				Old:  NetworkPod{ContainerIP: containerIP, NetworkVni: s.networkDefinitions[podSpec.NetworkName].Vni},
+			})
+		}
 	}
 
 	/* Routes */

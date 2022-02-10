@@ -185,6 +185,10 @@ type LocalPodSpec struct {
 
 	/* Caching */
 	NeedsSnat bool
+
+	/* Multi net */
+	NetworkNameSize int `struc:"int16,sizeof=NetworkName"`
+	NetworkName     string
 }
 
 // XXX: Increment CniServerStateFileVersion when changing this struct
