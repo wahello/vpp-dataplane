@@ -73,7 +73,7 @@ func (s *Server) hasVRF(podSpec *storage.LocalPodSpec) bool {
 		}
 	}
 
-    if hasIp4 != hasIp6 {
+	if hasIp4 != hasIp6 {
 		s.log.Warnf("Partial VRF state hasv4=%t hasv6=%t key=%s", hasIp4, hasIp6, podSpec.Key())
 	}
 
@@ -103,6 +103,15 @@ func (s *Server) AddVppInterface(podSpec *storage.LocalPodSpec, doHostSideConf b
 	buffersNeeded, err := s.checkAvailableBuffers()
 	if err != nil {
 		goto err
+	}
+
+	if podSpec.NetworkName != "" {
+		s.log.Infof("Checking network exists")
+		_, found := s.networkDefinitions[podSpec.NetworkName]
+		if !found {
+			s.log.Errorf("network %s does not exist", podSpec.NetworkName)
+			goto err
+		}
 	}
 
 	s.log.Infof("Creating Pod VRF")
@@ -223,10 +232,13 @@ func (s *Server) DelVppInterface(podSpec *storage.LocalPodSpec) {
 		}
 	} else {
 		for _, containerIP := range podSpec.GetContainerIps() {
-			common.SendEvent(common.CalicoVppEvent{
-				Type: common.LocalNetworkPodAddressDeleted,
-				Old:  NetworkPod{ContainerIP: containerIP, NetworkVni: s.networkDefinitions[podSpec.NetworkName].Vni},
-			})
+			netDef, found := s.networkDefinitions[podSpec.NetworkName]
+			if found {
+				common.SendEvent(common.CalicoVppEvent{
+					Type: common.LocalNetworkPodAddressDeleted,
+					Old:  NetworkPod{ContainerIP: containerIP, NetworkVni: netDef.Vni},
+				})
+			}
 		}
 	}
 
@@ -268,9 +280,10 @@ func (s *Server) DelVppInterface(podSpec *storage.LocalPodSpec) {
 
 	s.log.Infof("Deleting Pod VRF")
 	s.DeletePodVRF(podSpec)
-
-	common.SendEvent(common.CalicoVppEvent{
-		Type: common.PodDeleted,
-		Old:  podSpec,
-	})
+	if podSpec.NetworkName == "" {
+		common.SendEvent(common.CalicoVppEvent{
+			Type: common.PodDeleted,
+			Old:  podSpec,
+		})
+	}
 }
